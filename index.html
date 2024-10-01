@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toronto Weather</title>
+    <style>
+        body {
+            background-color: #f0f8ff; /* Light background */
+            background-image: url('image.jpg');
+            font-family: Arial, sans-serif; /* Clean font */
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+        }
+
+        h1 {
+            color: #333; /* Darker color for the title */
+            text-align: center;
+            margin: 30px 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #weather {
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+            margin: 20px auto;
+            transition: transform 0.2s;
+            text-align: center; /* Center text */
+        }
+
+        #weather:hover {
+            transform: scale(1.05); /* Slightly enlarge on hover */
+        }
+
+        h2 {
+            color: #007bff;
+            margin: 0 0 15px;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        p {
+            color: #333;
+            margin: 8px 0;
+            font-size: 1.1em;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        @media (max-width: 600px) {
+            #weather {
+                width: 90%; /* Responsive width */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather Forecast</h1>
+    <div id="weather">Loading...</div>
+    <div class="footer">Data provided by WeatherAPI</div>
+
+    <script>
+        const xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+
+        xhr.addEventListener('readystatechange', function () {
+            if (this.readyState === XMLHttpRequest.DONE) {
+                const weatherDiv = document.getElementById('weather');
+                if (this.status >= 200 && this.status < 300) {
+                    try {
+                        const response = JSON.parse(this.responseText);
+                        const { 
+                            temp_c, 
+                            condition, 
+                            wind_mph, 
+                            humidity, 
+                            feelslike_c 
+                        } = response.current;
+
+                        weatherDiv.innerHTML = `
+                            <h2>Temperature: ${temp_c}°C</h2>
+                            <p>Condition: ${condition.text}</p>
+                            <p>Feels Like: ${feelslike_c}°C</p>
+                            <p>Wind Speed: ${wind_mph} mph</p>
+                            <p>Humidity: ${humidity}%</p>
+                        `;
+                    } catch (error) {
+                        weatherDiv.innerHTML = 'Failed to parse response.';
+                        console.error('Failed to parse response:', error);
+                    }
+                } else {
+                    weatherDiv.innerHTML = 'Request failed with status: ' + this.status;
+                    console.error('Request failed with status:', this.status);
+                }
+            }
+        });
+
+        // Request weather data for Brampton
+        xhr.open('GET', 'https://weatherapi-com.p.rapidapi.com/current.json?q=Brampton');
+        xhr.setRequestHeader('x-rapidapi-key', 'f640d2931cmshbee82fe21d9c35dp1f65cejsna23d01669c68'); 
+        xhr.setRequestHeader('x-rapidapi-host', 'weatherapi-com.p.rapidapi.com');
+
+        xhr.send();
+    </script>
+</body>
+</html>
